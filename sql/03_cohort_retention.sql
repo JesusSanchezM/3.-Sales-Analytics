@@ -1,10 +1,10 @@
 -- ============================================================
 -- COHORT RETENTION ANALYSIS - Olist E-commerce
--- Objetivo: Medir la retención de clientes mes a mes
+-- Objective: Measure customer retention month over month
 -- ============================================================
 
 WITH 
--- 1. Fecha de primera compra de cada cliente (Cohorte)
+-- 1. First purchase date per customer (Cohort)
 first_orders AS (
     SELECT 
         c.customer_unique_id,
@@ -16,7 +16,7 @@ first_orders AS (
     GROUP BY c.customer_unique_id
 ),
 
--- 2. Actividad mensual de cada cliente (todas sus compras)
+-- 2. Monthly activity per customer (all their purchases)
 cohort_activity AS (
     SELECT 
         f.cohort_month,
@@ -29,7 +29,7 @@ cohort_activity AS (
     WHERE o.order_status = 'delivered'
 )
 
--- 3. Cálculo de retención (%)
+-- 3. Calculate retention rate (%)
 SELECT 
     cohort_month,
     month_offset,

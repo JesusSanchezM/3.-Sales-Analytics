@@ -2,22 +2,22 @@ import pandas as pd
 from sqlalchemy import create_engine
 import os
 
-# ===================== CONFIGURACIÓN =====================
+# ===================== CONFIGURATION =====================
 DB_USER = "jesussanchez"
 DB_PASSWORD = ""  
 DB_HOST = "localhost"
 DB_PORT = "5432"
 DB_NAME = "olist_db"
 
-# Ruta donde están tus CSVs (ajusta si es necesario)
+# Path to your CSV files (adjust if necessary)
 RAW_DATA_PATH = "./data/raw/"
 
-# ===================== CREAR CONEXIÓN =====================
+# ===================== CREATE CONNECTION =====================
 engine = create_engine(f'postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}')
 
-# ===================== DICCIONARIO DE ARCHIVOS =====================
-# (nombre del archivo -> nombre de la tabla en PostgreSQL)
-archivos = {
+# ===================== FILE DICTIONARY =====================
+# (filename -> table name in PostgreSQL)
+files = {
     "olist_customers_dataset.csv": "customers",
     "olist_geolocation_dataset.csv": "geolocation",
     "olist_order_items_dataset.csv": "order_items",
@@ -29,19 +29,18 @@ archivos = {
     "product_category_name_translation.csv": "category_translation"
 }
 
-# ===================== CARGAR DATOS =====================
-print("⏳ Conectando a PostgreSQL...")
-print("📤 Cargando datos...")
+# ===================== LOAD DATA =====================
+print("⏳ Connecting to PostgreSQL...")
+print("📤 Loading data...")
 
-for archivo, tabla in archivos.items():
-    ruta = os.path.join(RAW_DATA_PATH, archivo)
-    if not os.path.exists(ruta):
-        print(f"⚠️ Archivo no encontrado: {ruta}")
+for file, table in files.items():
+    file_path = os.path.join(RAW_DATA_PATH, file)
+    if not os.path.exists(file_path):
+        print(f"⚠️ File not found: {file_path}")
         continue
-    print(f"   📥 {archivo} -> {tabla} ...")
-    df = pd.read_csv(ruta)
-    # Si la tabla ya existe, la reemplazamos
-    df.to_sql(tabla, engine, if_exists='replace', index=False)
-    print(f"      ✅ {len(df)} registros insertados.")
+    print(f"   📥 {file} -> {table} ...")
+    df = pd.read_csv(file_path)
+    df.to_sql(table, engine, if_exists='replace', index=False)
+    print(f"      ✅ {len(df)} records inserted.")
 
-print("🎉 ¡Todos los datos cargados exitosamente a PostgreSQL!")
+print("🎉 All data successfully loaded to PostgreSQL!")

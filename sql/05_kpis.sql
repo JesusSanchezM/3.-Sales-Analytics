@@ -1,10 +1,10 @@
 -- ============================================================
 -- KPI DASHBOARD - Olist E-commerce
--- Objetivo: Resumen ejecutivo de métricas clave para dashboard
+-- Objective: Executive summary of key metrics for dashboard
 -- ============================================================
 
 WITH
--- 1. Métricas generales de pedidos
+-- 1. Order metrics
 order_metrics AS (
     SELECT
         COUNT(DISTINCT o.order_id) AS total_orders,
@@ -18,7 +18,7 @@ order_metrics AS (
     WHERE o.order_status = 'delivered'
 ),
 
--- 2. Métricas financieras
+-- 2. Financial metrics
 financial_metrics AS (
     SELECT
         SUM(oi.price + oi.freight_value) AS total_revenue,
@@ -31,7 +31,7 @@ financial_metrics AS (
     WHERE o.order_status = 'delivered'
 ),
 
--- 3. Métricas de clientes (frecuencia y antigüedad)
+-- 3. Customer metrics (frequency and revenue per customer)
 customer_metrics AS (
     SELECT
         ROUND(AVG(customer_freq)::numeric, 2) AS avg_orders_per_customer,
@@ -49,7 +49,7 @@ customer_metrics AS (
     ) AS customer_stats
 ),
 
--- 4. Métricas de temporalidad (últimos 30 días vs total)
+-- 4. Recent metrics (last 30 days vs total)
 recent_metrics AS (
     SELECT
         COUNT(DISTINCT CASE 
@@ -66,7 +66,7 @@ recent_metrics AS (
     WHERE o.order_status = 'delivered'
 )
 
--- 5. Unificar todo en una sola fila
+-- 5. Unify everything into a single row
 SELECT
     om.total_orders,
     om.total_customers,
@@ -82,7 +82,7 @@ SELECT
     cm.avg_revenue_per_customer,
     rm.orders_last_30d,
     rm.revenue_last_30d,
-    -- KPIs derivados
+    -- Derived KPIs
     ROUND((fm.total_revenue / NULLIF(om.total_customers, 0))::numeric, 2) AS revenue_per_customer,
     ROUND((fm.total_revenue / NULLIF(om.total_orders, 0))::numeric, 2) AS revenue_per_order,
     ROUND((rm.revenue_last_30d / NULLIF(rm.orders_last_30d, 0))::numeric, 2) AS avg_ticket_last_30d

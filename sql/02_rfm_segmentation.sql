@@ -1,11 +1,10 @@
-
-
 -- ============================================================
 -- RFM SEGMENTATION - Olist E-commerce
+-- Objective: Segment customers based on Recency, Frequency, and Monetary scores
 -- ============================================================
 
 WITH 
--- 1. Calcular métricas RFM por cliente
+-- 1. Calculate RFM metrics per customer
 customer_metrics AS (
     SELECT 
         c.customer_unique_id,
@@ -19,12 +18,12 @@ customer_metrics AS (
     GROUP BY c.customer_unique_id
 ),
 
--- 2. Fecha de referencia (última compra en todo el dataset)
+-- 2. Reference date (latest purchase in the entire dataset)
 reference_date AS (
     SELECT MAX(order_purchase_timestamp::timestamp) AS max_date FROM orders
 ),
 
--- 3. Calcular días desde última compra
+-- 3. Calculate days since last purchase and RFM scores
 rfm_scores AS (
     SELECT 
         customer_unique_id,
@@ -37,7 +36,7 @@ rfm_scores AS (
     FROM customer_metrics
 )
 
--- 4. Segmentación
+-- 4. Customer segmentation
 SELECT 
     customer_unique_id,
     recency_days,
@@ -56,6 +55,3 @@ SELECT
     END AS customer_segment
 FROM rfm_scores
 ORDER BY total_score DESC, monetary DESC;
-
-
-

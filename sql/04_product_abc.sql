@@ -1,10 +1,10 @@
 -- ============================================================
 -- ABC PRODUCT CLASSIFICATION - Olist E-commerce
--- Objetivo: Identificar productos críticos por ingreso generado
+-- Objective: Identify critical products by revenue generated
 -- ============================================================
 
 WITH 
--- 1. Ingreso total por categoría de producto
+-- 1. Total revenue per product category
 product_revenue AS (
     SELECT 
         p.product_category_name,
@@ -16,14 +16,14 @@ product_revenue AS (
     GROUP BY p.product_category_name
 ),
 
--- 2. Calcular ingreso acumulado y porcentaje de contribución
+-- 2. Calculate cumulative revenue and contribution percentage
 abc_calc AS (
     SELECT 
         product_category_name,
         total_revenue,
         SUM(total_revenue) OVER (ORDER BY total_revenue DESC) AS cumulative_revenue,
         SUM(total_revenue) OVER () AS total_overall,
-        -- Convertir a numeric antes de redondear
+        -- Convert to numeric before rounding
         ROUND(
             (100.0 * SUM(total_revenue) OVER (ORDER BY total_revenue DESC) / 
             SUM(total_revenue) OVER ())::numeric,
@@ -32,15 +32,15 @@ abc_calc AS (
     FROM product_revenue
 )
 
--- 3. Asignar clase ABC
+-- 3. Assign ABC class
 SELECT 
     product_category_name,
     total_revenue,
     cumulative_percent,
     CASE 
-        WHEN cumulative_percent <= 80 THEN 'A (Alto impacto)'
-        WHEN cumulative_percent <= 95 THEN 'B (Impacto medio)'
-        ELSE 'C (Bajo impacto)'
+        WHEN cumulative_percent <= 80 THEN 'A (High impact)'
+        WHEN cumulative_percent <= 95 THEN 'B (Medium impact)'
+        ELSE 'C (Low impact)'
     END AS abc_class
 FROM abc_calc
 ORDER BY cumulative_percent ASC;
